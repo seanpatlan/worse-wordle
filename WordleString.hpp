@@ -1,69 +1,46 @@
 #include <string>
+#include <vector>
 #include <iostream>
+#include "WordleChar.hpp"
 #pragma once
-
-struct WordleChar {
-  enum LetterStatus {wrong = 47, inWord = 43, inSpot = 42};
-
-  char letter;
-  LetterStatus status;
-
-  WordleChar() : letter('\0'), status(wrong) {}
-  WordleChar(char c) : letter(std::toupper(c)), status(wrong) {}
-
-  void print() {
-    std::cout << "\033[1;30;" << status << "m " << letter << " \033[0m";
-  }
-
-  bool operator==(const char& c) { return letter == c; }
-  bool operator!=(const char& c) { return letter != c; }
-};
 
 class WordleString
 {
 private:
-  WordleChar *word;
-  int sz;
-  int WORD_SIZE;
+  // MEMBERS
+  std::vector<WordleChar> word;
 
 public:
   // CONSTRUCTORS/DESTRUCTORS
-  WordleString(int wSize) :
-    word(new WordleChar[wSize]),
-    sz(0),
-    WORD_SIZE(wSize)
+  WordleString() :
+    word(std::vector<WordleChar>())
+  {}
+  WordleString(const WordleString& ws) :
+    word(ws.allLetters())
   {}
   WordleString(const std::string& str);
-  WordleString(const WordleString& ws);
   ~WordleString();
 
   // ACCESS FUNCTIONS
-  const int& size() const { return sz; }
-  const char& at(const int& i) const;
-  const WordleChar::LetterStatus& statusAt(const int& i) const;
-  const int& wordSize() const { return WORD_SIZE; }
-  const std::string wrongGuesses() const;
+  const int& size() const { return word.size(); }
+  const WordleChar& at(const int& i) const;
+  const std::vector<WordleChar>& allLetters() const { return word; }
   const std::string asString() const;
-  void printResult() const;
-  void printStatus() const;
+  void print() const;
 
   // MODIFIER FUNCTIONS
-  void add(const char& c);
-  void add(const std::string& str);
-  void clear();
+  void add(const WordleChar& wc) { word.push_back(wc); }
+  void clear() { word.clear(); }
   void evaluate(const std::string& str);
 
   // OPERATORS
-  bool operator==(const std::string str);
-  bool operator!=(const std::string str);
-  WordleString operator+(const WordleString& ws);
-  WordleString operator+(const std::string& str);
-  WordleString operator+(const char& c);
-  void operator+=(const WordleString& ws);
-  void operator+=(const std::string& str);
-  void operator+=(const char& c);
   void operator=(const std::string& s);
-  const char& operator[](const int& i) const;
+  void operator+=(const WordleString& ws);
+  void operator+=(const WordleChar& wc) { add(wc); }
+  WordleChar& operator[](const int& i) { return word[i]; }
+  const WordleChar& operator[](const int& i) const { return at(i); }
+  const bool& operator==(const std::string str) const;
+  const bool& operator!=(const std::string str) const { return !(*this == str); }
   friend std::ostream& operator<<(std::ostream& os, const WordleString& ws);
   friend std::istream& operator>>(std::istream& is, WordleString& ws);
 };
