@@ -78,7 +78,7 @@ WordleString WordleGame::getUserGuess()
     if (!guesses.empty()) std::cout << '\n';
 
     if (!guessString.empty())
-      std::cout << "Guess must be " << wsz << " letters\n";
+      std::cout << "Guess must be " << wsz << " letters\n\n";
 
     std::cout << "Guess #" << guessCount()+1 << "\nEnter your guess here:\n";
     std::cin >> guessString;

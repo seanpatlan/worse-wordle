@@ -11,6 +11,9 @@ private:
   std::vector<WordleChar> word;
 
 public:
+  typedef std::vector<WordleChar>::iterator iterator;
+  typedef std::vector<WordleChar>::const_iterator const_iterator;
+
   // CONSTRUCTORS/DESTRUCTORS
   WordleString() :
     word(std::vector<WordleChar>())
@@ -23,7 +26,12 @@ public:
 
   // ACCESS FUNCTIONS
   const int& size() const { return word.size(); }
+  const bool& empty() const { return word.empty(); }
   const WordleChar& at(const int& i) const;
+  iterator begin() { return word.begin(); }
+  const_iterator begin() const { return word.begin(); }
+  iterator end() { return word.end(); }
+  const_iterator end() const { return word.end(); }
   const std::vector<WordleChar>& allLetters() const { return word; }
   const std::string asString() const;
   void print() const;

@@ -85,8 +85,8 @@ void WordleString::operator=(const std::string& str)
 
 void WordleString::operator+=(const WordleString& ws)
 {
-  for (int i = 0; i < ws.size(); i++)
-    add(ws[i]);
+  for (const WordleChar& wc : ws)
+    add(wc);
 }
 
 const bool& WordleString::operator==(const std::string str) const
