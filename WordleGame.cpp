@@ -1,4 +1,5 @@
 #include <fstream>
+#include <limits>
 #include "WordleGame.hpp"
 
 /******************************************************************************/
@@ -46,16 +47,15 @@ void WordleGame::printWrongLetters() const
 
 void WordleGame::setWordSize()
 {
-  int n = 0;
-  std::string s;
-  while (n < 4 || n > 7) {
+  char c;
+  while (c < '4' || c > '7') {
     system("clear");
     std::cout << "Would you like to play with 4, 5, 6, or 7 letter words? ";
-    std::cin >> s;
-    n = std::stoi(s);
+    std::cin.read(&c,1);
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
   }
 
-  wsz = n;
+  wsz = static_cast<int>(c) - 48;
 }
 
 void WordleGame::loadWordList()
@@ -82,6 +82,7 @@ WordleString WordleGame::getUserGuess()
 
     std::cout << "Guess #" << guessCount()+1 << "\nEnter your guess here:\n";
     std::cin >> guessString;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
   } while (guessString.size() != wsz);
 
   return WordleString(guessString);
@@ -89,7 +90,7 @@ WordleString WordleGame::getUserGuess()
 
 bool WordleGame::confirmUserGuess(const WordleString& ws)
 {
-  std::string response;
+  char c;
   while (true) {
     system("clear");
     printWrongLetters();
@@ -99,10 +100,11 @@ bool WordleGame::confirmUserGuess(const WordleString& ws)
     ws.print();
 
     std::cout << "(Colors are currently hidden)\n\nConfirm this guess? (y/n) ";
-    std::cin >> response;
+    std::cin.read(&c,1);
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
 
-    if (response == "y" || response == "Y") return true;
-    if (response == "n" || response == "N") return false;
+    if (std::toupper(c) == 'Y') return true;
+    if (std::toupper(c) == 'N') return false;
   }
 }
 
@@ -123,21 +125,20 @@ void WordleGame::displayWin(const std::string& secretWord) const
   std::cout << "\nCongrats! You got it in " << guessCount() << " guesses!\n\n";
   std::cout << "Press enter to continue...\n";
 
-  // can't figure out how to avoid putting this twice...
-  std::cin.ignore();
-  std::cin.ignore();
+  std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
 }
 
 bool WordleGame::keepPlaying()
 {
-  std::string response;
+  char c;
   while (true) {
     system("clear");
     std::cout << "Enter 'y' to keep playing, enter 'q' to quit... ";
-    std::cin >> response;
+    std::cin.read(&c,1);
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
 
-    if (response == "y" || response == "Y") return true;
-    if (response == "q" || response == "Q") return false;
+    if (std::toupper(c) == 'Y') return true;
+    if (std::toupper(c) == 'Q') return false;
   }
 }
 
