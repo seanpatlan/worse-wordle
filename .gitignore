@@ -1,6 +1,10 @@
 # Specific
-test
 test.cpp
+settings.txt
+wordle
+list-maker
+settings
+t
 
 # Prerequisites
 *.d
