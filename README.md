@@ -16,4 +16,4 @@ Just a worse command line version of Wordle written in C++
 ### To adjust the game settings:
 1. Download and compile the code (instructions above)
 2. Type the command `./settings`
-3. *WARNING: trying to edit the settings.txt file directly may corrupt the file*
+3. *__WARNING:__ trying to edit the settings.txt file directly may corrupt the file*
