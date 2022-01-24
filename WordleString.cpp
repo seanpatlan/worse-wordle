@@ -21,10 +21,10 @@ WordleString::~WordleString()
 /****************************** ACCESS FUNCTIONS ******************************/
 /******************************************************************************/
 
-const WordleChar& WordleString::at(const int& i) const
+const WordleChar& WordleString::at(uint i) const
 {
-  if (i < 0 || i >= word.size())
-    return WordleChar('\0');
+  if (i >= word.size())
+    return WordleChar();
 
   return word[i];
 }
@@ -38,7 +38,7 @@ bool WordleString::repeatedLetters() const
   return false;
 }
 
-const std::string WordleString::asString() const
+std::string WordleString::asString() const
 {
   std::string str = "";
   for (const WordleChar& wc : word)
@@ -47,7 +47,7 @@ const std::string WordleString::asString() const
   return str;
 }
 
-const std::string WordleString::print() const
+std::string WordleString::print() const
 {
   std::stringstream ss;
   for (const WordleChar& wc : word)
@@ -101,7 +101,7 @@ void WordleString::operator+=(const WordleString& ws)
     add(wc);
 }
 
-const bool& WordleString::operator==(const std::string str) const
+bool WordleString::operator==(const std::string str) const
 {
   if (str.size() != word.size()) return false;
 

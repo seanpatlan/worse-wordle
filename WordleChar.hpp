@@ -32,7 +32,7 @@ struct WordleChar
     return "\033[1;30;" + std::to_string(color) + "m " + letter + " \033[0m";
   }
 
-  const std::string& colorString() const
+  std::string colorString() const
   {
     switch (color) {
       case white:
@@ -59,6 +59,7 @@ struct WordleChar
 
   void operator=(const char& c)
   {
+    color = Color::white;
     letter = c;
   }
 

@@ -32,14 +32,14 @@ bool WordleGame::guessLimit() const
          (guesses.size() < gameSettings.guessLimit);
 }
 
-const std::string WordleGame::printGuesses() const
+std::string WordleGame::printGuesses() const
 {
   std::string s = "";
   for (const WordleString& ws : guesses) s += ws.print();
   return s;
 }
 
-const std::string WordleGame::printWrongLetters() const
+std::string WordleGame::printWrongLetters() const
 {
   if (wrongLetters.empty()) return "";
 
@@ -88,7 +88,7 @@ void WordleGame::loadWordList()
   }
 }
 
-void WordleGame::selectSecretWord(const int& r)
+void WordleGame::selectSecretWord(uint r)
 {
   if (wordList.empty())
     throw "Error: word bank is empty";
