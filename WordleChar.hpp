@@ -27,9 +27,9 @@ struct WordleChar
   {}
 
   // ACCESS FUNCTIONS
-  void print() const
+  std::string print() const
   {
-    std::cout << "\033[1;30;" << color << "m " << letter << " \033[0m";
+    return "\033[1;30;" + std::to_string(color) + "m " + letter + " \033[0m";
   }
 
   const std::string& colorString() const

@@ -1,3 +1,4 @@
+#include <sstream>
 #include "WordleString.hpp"
 
 /******************************************************************************/
@@ -28,6 +29,15 @@ const WordleChar& WordleString::at(const int& i) const
   return word[i];
 }
 
+bool WordleString::repeatedLetters() const
+{
+  for (int i = 0; i < word.size(); i++)
+    for (int j = 0; j < word.size(); j++)
+      if (word[i].letter == word[j].letter && i != j)
+        return true;
+  return false;
+}
+
 const std::string WordleString::asString() const
 {
   std::string str = "";
@@ -37,11 +47,13 @@ const std::string WordleString::asString() const
   return str;
 }
 
-void WordleString::print() const
+const std::string WordleString::print() const
 {
+  std::stringstream ss;
   for (const WordleChar& wc : word)
-    wc.print();
-  std::cout << '\n';
+    ss << wc.print();
+  ss << '\n';
+  return ss.str();
 }
 
 /******************************************************************************/

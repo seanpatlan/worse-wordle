@@ -12,23 +12,28 @@ int main()
 
   WordleGame game;
   WordleString guess;
-  string secretWord;
-  do {
-    guess.clear();
-    game.reset();
-    secretWord = game.selectSecretWord(rand());
+  try {
     do {
+      guess.clear();
+      game.reset();
+      game.selectSecretWord(rand());
       do {
-        guess = game.getUserGuess();
-      } while (!game.confirmUserGuess(guess));
+        do {
+          guess = game.getUserGuess();
+        } while (!game.confirmUserGuess(guess));
 
-      guess.evaluate(secretWord);
-      game.addGuess(guess);
-    } while (guess != secretWord);
-    game.displayWin(secretWord);
-  } while (game.keepPlaying());
+        guess.evaluate(game.secretWord());
+        game.addGuess(guess);
+      } while (guess != game.secretWord() && game.guessLimit());
+      game.endDisplay();
+    } while (game.keepPlaying());
 
-  system("clear");
+    if (!game.settings().debugMode) system("clear");
+  }
+  catch(const char* errorMessage) {
+    if (!game.settings().debugMode) system("clear");
+    cout << errorMessage;
+  }
 
   return 0;
 }

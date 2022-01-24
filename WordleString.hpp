@@ -33,8 +33,9 @@ public:
   iterator end() { return word.end(); }
   const_iterator end() const { return word.end(); }
   const std::vector<WordleChar>& allLetters() const { return word; }
+  bool repeatedLetters() const;
   const std::string asString() const;
-  void print() const;
+  const std::string print() const;
 
   // MODIFIER FUNCTIONS
   void add(const WordleChar& wc) { word.push_back(wc); }

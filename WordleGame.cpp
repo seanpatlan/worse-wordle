@@ -1,5 +1,7 @@
 #include <fstream>
-#include <limits>
+#include <sstream>
+#include <iostream>
+#include "WordleResponse.hpp"
 #include "WordleGame.hpp"
 
 /******************************************************************************/
@@ -16,29 +18,37 @@ WordleGame::~WordleGame()
 /****************************** ACCESS FUNCTIONS ******************************/
 /******************************************************************************/
 
-const std::string& WordleGame::selectSecretWord(const int& r) const
+bool WordleGame::inWordList(const std::string& word) const
 {
-  if (wordList.empty())
-    return "";
-  else
-    return wordList[ r % wordList.size() ];
+  for (const std::string& s : wordList)
+    if (WordleString(word) == s)
+      return true;
+  return false;
 }
 
-void WordleGame::printGuesses() const
+bool WordleGame::guessLimit() const
 {
-    for (const WordleString& ws : guesses)
-      ws.print();
+  return (gameSettings.guessLimit == 0) ||
+         (guesses.size() < gameSettings.guessLimit);
 }
 
-void WordleGame::printWrongLetters() const
+const std::string WordleGame::printGuesses() const
 {
-  if (wrongLetters.empty()) return;
+  std::string s = "";
+  for (const WordleString& ws : guesses) s += ws.print();
+  return s;
+}
 
-  std::cout << "Wrong letters: ";
+const std::string WordleGame::printWrongLetters() const
+{
+  if (wrongLetters.empty()) return "";
+
+  std::string msg = "Wrong letters: ";
   for (const char& c : wrongLetters)
-    WordleChar(c).print();
-  std::cout << "\n";
+    msg += WordleChar(c).print();
+  msg += "\n";
 
+  return msg;
 }
 
 /******************************************************************************/
@@ -47,65 +57,82 @@ void WordleGame::printWrongLetters() const
 
 void WordleGame::setWordSize()
 {
-  char c;
-  while (c < '4' || c > '7') {
-    system("clear");
-    std::cout << "Would you like to play with 4, 5, 6, or 7 letter words? ";
-    std::cin.read(&c,1);
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+  if (gameSettings.wordSize == 0) {
+    std::string msg = "Would you like to play with 4, 5, 6, or 7 letter words?\n";
+    wsz = WordleResponse::getIntResponse(msg, 4, 7, gameSettings.debugMode);
   }
-
-  wsz = static_cast<int>(c) - 48;
+  else
+    wsz = gameSettings.wordSize;
 }
 
 void WordleGame::loadWordList()
 {
-  std::ifstream ifs(std::to_string(wsz) + "-list.txt");
-  wordList.clear();
+  WordleString ws;
 
-  std::string s;
-  while (ifs >> s) wordList.push_back(s);
+  wordList.clear();
+  std::ifstream lin(std::to_string(wsz) + "-list.csv");
+  while (lin >> ws) {
+    if (gameSettings.repeatedLetters)
+      wordList.push_back(ws.asString());
+    else if (!ws.repeatedLetters())
+      wordList.push_back(ws.asString());
+  }
+
+  validWords.clear();
+  std::ifstream din(std::to_string(wsz) + "-dict.csv");
+  while (din >> ws) {
+    if (gameSettings.repeatedLetters)
+      validWords.insert(ws.asString());
+    else if (!ws.repeatedLetters())
+      validWords.insert(ws.asString());
+  }
+}
+
+void WordleGame::selectSecretWord(const int& r)
+{
+  if (wordList.empty())
+    throw "Error: word bank is empty";
+  else
+    sw = wordList[ r % wordList.size() ];
 }
 
 WordleString WordleGame::getUserGuess()
 {
   std::string guessString;
   do {
-    system("clear");
-    printWrongLetters();
-    if (!wrongLetters.empty()) std::cout << '\n';
-    printGuesses();
-    if (!guesses.empty()) std::cout << '\n';
+    if (!gameSettings.debugMode) system("clear");
 
-    if (!guessString.empty())
-      std::cout << "Guess must be " << wsz << " letters\n\n";
+    std::string msg = printWrongLetters();
+    if (!wrongLetters.empty()) msg += '\n';
+    msg += printGuesses();
+    if (!guesses.empty()) msg += '\n';
 
-    std::cout << "Guess #" << guessCount()+1 << "\nEnter your guess here:\n";
-    std::cin >> guessString;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
-  } while (guessString.size() != wsz);
+    if (!guessString.empty()) {
+      if (guessString == WordleResponse::INVALID_SIZE)
+        msg += "Guess must be " + std::to_string(wsz) + " letters\n\n";
+      else
+        msg += "Not a valid word\n\n";
+    }
+
+    msg += "Guess #" + std::to_string(guessCount()+1) + '\n';
+    guessString = WordleResponse::getStringResponse(msg, wsz, gameSettings.debugMode);
+  } while (guessString == WordleResponse::INVALID_SIZE ||
+          validWords.find(WordleString(guessString).asString()) == validWords.end());
 
   return WordleString(guessString);
 }
 
 bool WordleGame::confirmUserGuess(const WordleString& ws)
 {
-  char c;
-  while (true) {
-    system("clear");
-    printWrongLetters();
-    if (!wrongLetters.empty()) std::cout << '\n';
-    printGuesses();
-    if (!guesses.empty()) std::cout << '\n';
-    ws.print();
+  std::string msg = "";
+  msg += printWrongLetters();
+  if (!wrongLetters.empty()) msg += '\n';
+  msg += printGuesses();
+  if (!guesses.empty()) msg += '\n';
+  msg += ws.print();
+  msg += "(Colors are currently hidden)\n\nConfirm this guess?\n";
 
-    std::cout << "(Colors are currently hidden)\n\nConfirm this guess? (y/n) ";
-    std::cin.read(&c,1);
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
-
-    if (std::toupper(c) == 'Y') return true;
-    if (std::toupper(c) == 'N') return false;
-  }
+  return WordleResponse::getBoolResponse(msg, 'y', 'n', gameSettings.debugMode);
 }
 
 void WordleGame::addGuess(const WordleString& ws)
@@ -117,29 +144,32 @@ void WordleGame::addGuess(const WordleString& ws)
       wrongLetters.insert(ws[i].letter);
 }
 
-void WordleGame::displayWin(const std::string& secretWord) const
+void WordleGame::endDisplay()
 {
-  system("clear");
-  std::cout << secretWord << "\n\n";
-  printGuesses();
-  std::cout << "\nCongrats! You got it in " << guessCount() << " guesses!\n\n";
-  std::cout << "Press enter to continue...\n";
+  std::string msg = sw + "\n\n";
+  msg += printGuesses();
+  if (guesses.back() == sw) {
+    msg += "\nCongrats! You got it in ";
+    msg += std::to_string(guessCount());
+    if (gameSettings.guessLimit != 0)
+      msg += "/" + std::to_string(gameSettings.guessLimit);
+    msg += " guesses!\n\n";
+  }
+  else {
+    msg += "\nSorry! You've used ";
+    msg += std::to_string(guessCount()) + '/';
+    msg += std::to_string(gameSettings.guessLimit);
+    msg += " guesses!\n\n";
+  }
+  msg += "Press enter to continue...\n";
 
-  std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+  WordleResponse::waitForEnter(msg, gameSettings.debugMode);
 }
 
 bool WordleGame::keepPlaying()
 {
-  char c;
-  while (true) {
-    system("clear");
-    std::cout << "Enter 'y' to keep playing, enter 'q' to quit... ";
-    std::cin.read(&c,1);
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
-
-    if (std::toupper(c) == 'Y') return true;
-    if (std::toupper(c) == 'Q') return false;
-  }
+  std::string msg = "Enter 'y' to keep playing, enter 'q' to quit\n";
+  return WordleResponse::getBoolResponse(msg, 'y', 'q', gameSettings.debugMode);
 }
 
 void WordleGame::reset()
@@ -147,6 +177,7 @@ void WordleGame::reset()
   guesses.clear();
   wrongLetters.clear();
 
+  gameSettings.load();
   setWordSize();
   loadWordList();
 }
