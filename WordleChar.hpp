@@ -14,10 +14,11 @@ struct WordleChar
     letter('\0'),
     color(white)
   {}
-  WordleChar(const char& c) : color(white)
+  WordleChar(const char& _c) : color(white)
   {
-    if (std::toupper(c) >= 'A' && std::toupper(c) <= 'Z')
-      letter = std::toupper(c);
+    char c = std::toupper(_c);
+    if ((c >= 'A' && c <= 'Z') || c == '_')
+      letter = c;
     else
       letter = 'X';
   }
