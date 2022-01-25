@@ -5,9 +5,6 @@ all:
 wordle:
 	g++ wordle.cpp WordleString.cpp WordleGame.cpp -w -o wordle
 
-list-maker:
-	g++ list-maker.cpp WordleString.cpp -w -o list-maker
-
 settings:
 	g++ settings.cpp -w -o settings
 
