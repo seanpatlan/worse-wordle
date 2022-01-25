@@ -16,14 +16,15 @@ struct WordleSettings
 
   // CONSTRUCTOR
   WordleSettings() :
-    wordSize(0),
-    repeatedLetters(false),
-    guessLimit(0),
+    wordSize(5),
+    repeatedLetters(true),
+    guessLimit(6),
     debugMode(false)
   {}
 
   // max size of I/O buffer
   static inline const int BUF_MAX = 128;
+  static inline const char* FILE_NAME = "config/settings.txt";
 
   // string labels for settings.txt
   static inline const char* WORD_SIZE = "word-size";
@@ -74,7 +75,7 @@ struct WordleSettings
 
   void load()
   {
-    std::ifstream ifs("settings.txt");
+    std::ifstream ifs(FILE_NAME);
     std::string label;
     std::string value;
 
