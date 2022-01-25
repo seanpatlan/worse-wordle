@@ -73,12 +73,8 @@ void WordleGame::loadWordList()
 
   validWords.clear();
   std::ifstream din("csv/" + std::to_string(wsz) + "-dict.csv");
-  while (din >> ws) {
-    if (gameSettings.repeatedLetters)
-      validWords.insert(ws.asString());
-    else if (!ws.repeatedLetters())
-      validWords.insert(ws.asString());
-  }
+  while (din >> ws)
+    validWords.insert(ws.asString());
 
   if (validWords.empty())
     throw std::string("ERROR: (") + __func__ + ") Dictionary is empty";
