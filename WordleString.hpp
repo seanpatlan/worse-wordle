@@ -17,14 +17,8 @@ private:
 
 public:
   // CONSTRUCTORS/DESTRUCTORS
-  WordleString() :
-    word(std::vector<WordleChar>())
-  {}
-  WordleString(const WordleString& ws) :
-    word(ws.allLetters())
-  {}
+  WordleString() {}
   WordleString(const std::string& str);
-  ~WordleString();
 
   // ACCESS FUNCTIONS
   uint size() const { return word.size(); }

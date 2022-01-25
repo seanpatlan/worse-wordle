@@ -21,19 +21,6 @@ private:
   std::unordered_set<std::string> validWords;
   WordleSettings gameSettings;
 public:
-  // CONSTRUCTORS/DESTRUCTORS
-  WordleGame() :
-    wsz(5), // default to 5 letter game
-    sw(""),
-    wordList(std::vector<std::string>()),
-    guesses(std::vector<WordleString>()),
-    wrongLetters(std::set<char>()),
-    validWords(std::unordered_set<std::string>()),
-    gameSettings(WordleSettings())
-  {}
-  WordleGame(const WordleGame& wg);
-  ~WordleGame();
-
   // ACCESS FUNCTIONS
   const uint& wordSize() const { return wsz; }
   uint guessCount() const { return guesses.size(); }

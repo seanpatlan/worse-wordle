@@ -14,6 +14,7 @@ struct WordleChar
     letter('\0'),
     color(white)
   {}
+  
   WordleChar(const char& _c) : color(white)
   {
     char c = std::toupper(_c);
@@ -22,10 +23,6 @@ struct WordleChar
     else
       letter = 'X';
   }
-  WordleChar(const WordleChar& wc) :
-    letter(wc.letter),
-    color(wc.color)
-  {}
 
   // ACCESS FUNCTIONS
   std::string print() const
