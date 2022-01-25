@@ -9,15 +9,17 @@ struct WordleSettings
   // MEMBERS
   int wordSize;
   bool repeatedLetters;
-  bool debugMode;
   int guessLimit;
+
+  // FOR DEBUGGING
+  bool debugMode;
 
   // CONSTRUCTOR
   WordleSettings() :
     wordSize(0),
     repeatedLetters(false),
-    debugMode(false),
-    guessLimit(0)
+    guessLimit(0),
+    debugMode(false)
   {}
 
   // max size of I/O buffer
@@ -26,35 +28,34 @@ struct WordleSettings
   // string labels for settings.txt
   static inline const char* WORD_SIZE = "word-size";
   static inline const char* REP_LETTERS = "repeated-letters";
-  static inline const char* DEBUG_MODE = "debug-mode";
   static inline const char* GUESS_LIMIT = "guess-limit";
+  static inline const char* DEBUG_MODE = "debug-mode";
 
   template<class T>
-  std::ostream& put(std::ostream& os, const std::string& label, const T& value)
+  std::ostream& put(std::ostream& out, const std::string& label, const T& value)
   {
-    os << label << ": " << value << ",\n";
-    return os;
+    out << label << ": " << value << ",\n";
+    return out;
   }
 
-  std::istream& get(std::istream& is, char *label, char *value)
+  std::istream& get(std::istream& in, std::string& label, std::string& value)
   {
-    char *buf = new char[BUF_MAX];
-    is.getline(buf, BUF_MAX);
+    std::string s;
+    getline(in, s);
 
-    *label = '\0';
-    *value = '\0';
-    std::stringstream ss(buf);
-    ss.getline(label, BUF_MAX, ':');
+    label.clear();
+    value.clear();
 
-    while (ss.peek() == ' ') ss.ignore();
+    auto it = s.begin();
+    while (it != s.end() && *it != ':')
+      label += *(it++);
 
-    int i = 0;
-    while (i < BUF_MAX && ss.peek() != ',' && !std::isspace(ss.peek()))
-      ss.get(value[i++]);
-    value[i] = '\0';
-    delete[] buf;
+    while (it != s.end() && (*it == ':' || *it == ' ')) it++;
 
-    return is;
+    while (it != s.end() && *it != ',' && !std::isspace(*it))
+      value += *(it++);
+
+    return in;
   }
 
   void set(const std::string& label, const std::string& value)
@@ -74,13 +75,11 @@ struct WordleSettings
   void load()
   {
     std::ifstream ifs("settings.txt");
-    char *label = new char[BUF_MAX];
-    char *value = new char[BUF_MAX];
+    std::string label;
+    std::string value;
 
     while (get(ifs, label, value))
       set(label, value);
-
-    delete[] label, value;
   }
 
 };

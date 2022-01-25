@@ -8,7 +8,7 @@ struct WordleResponse
   typedef unsigned int uint;
 
   static inline const char* INPUT_SYMBOL = "\n>> ";
-  static inline const char* INVALID_SIZE = "invalid-size";
+  static inline const char* INVALID_SIZE = "__invalid_size__";
 
   static std::string boolInputSymbol(char t, char f)
   {
@@ -24,11 +24,11 @@ struct WordleResponse
 
   static bool getBoolResponse(const std::string& msg, char t, char f, bool dbg)
   {
+    char c;
     while (true) {
       if (!dbg) system("clear");
       std::cout << msg << boolInputSymbol(t,f);
-
-      char c;
+      
       while (std::isspace(std::cin.peek())) std::cin.ignore();
       std::cin.get(c);
       std::cin.ignore(WordleSettings::BUF_MAX,'\n');
@@ -40,21 +40,20 @@ struct WordleResponse
 
   static uint getIntResponse(const std::string& msg, uint min, uint max, bool dbg)
   {
-    char *buf = new char[WordleSettings::BUF_MAX];
-    int n = -1;
-    while (n < 0) {
+    uint n = -1;
+    std::string s;
+    while (n == -1) {
       if (!dbg) system("clear");
       std::cout << msg << INPUT_SYMBOL;
-
-      std::cin.getline(buf, WordleSettings::BUF_MAX);
+      getline(std::cin, s);
       try {
-        n = std::stoi(buf);
+        n = std::stoi(s);
       } catch (...) {
         n = -1;
       }
       if (n < min || n > max) n = -1;
     }
-    delete[] buf;
+
     return n;
   }
 
