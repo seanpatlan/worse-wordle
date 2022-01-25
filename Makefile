@@ -1,15 +1,20 @@
-all:
-	g++ wordle.cpp WordleString.cpp WordleGame.cpp -w -o wordle
-	g++ settings.cpp -w -o settings
+CC = g++
+CFLAGS = -w
+H_DEPS = src/WordleChar.hpp src/WordleResponse.hpp src/WordleSettings.hpp
+GAME_DEPS = src/WordleString.cpp src/WordleGame.cpp
 
-wordle:
-	g++ wordle.cpp WordleString.cpp WordleGame.cpp -w -o wordle
+all: wordle.cpp $(GAME_DEPS) settings.cpp $(H_DEPS)
+	$(CC) wordle.cpp $(GAME_DEPS) $(CFLAGS) -o wordle
+	$(CC) settings.cpp $(CFLAGS) -o settings
 
-settings:
-	g++ settings.cpp -w -o settings
+wordle: wordle.cpp $(GAME_DEPS) $(H_DEPS)
+	$(CC) wordle.cpp $(GAME_DEPS) $(CFLAGS) -o wordle
 
-test:
-	g++ test.cpp WordleString.cpp WordleGame.cpp -w -o t
+settings: settings.cpp $(H_DEPS)
+	$(CC) settings.cpp $(CFLAGS) -o settings
+
+test: test.cpp $(GAME_DEPS) $(H_DEPS)
+	$(CC) test.cpp $(GAME_DEPS) $(CFLAGS) -o t
 
 clean:
 	rm -rf wordle list-maker settings t

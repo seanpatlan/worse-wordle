@@ -2,8 +2,8 @@
 #include <string>
 #include <stdlib.h>
 #include <time.h>
-#include "WordleString.hpp"
-#include "WordleGame.hpp"
+#include "src/WordleString.hpp"
+#include "src/WordleGame.hpp"
 using namespace std;
 
 int main()
@@ -30,9 +30,9 @@ int main()
 
     if (!game.settings().debugMode) system("clear");
   }
-  catch(const char* errorMessage) {
+  catch(const string& errorMessage) {
     if (!game.settings().debugMode) system("clear");
-    cout << errorMessage;
+    cout << errorMessage << '\n';
   }
 
   return 0;

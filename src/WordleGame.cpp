@@ -68,6 +68,9 @@ void WordleGame::loadWordList()
       wordList.push_back(ws.asString());
   }
 
+  if (wordList.empty())
+    throw std::string("ERROR: (") + __func__ + ") Word list is empty";
+
   validWords.clear();
   std::ifstream din("dict/" + std::to_string(wsz) + "-dict.csv");
   while (din >> ws) {
@@ -76,12 +79,15 @@ void WordleGame::loadWordList()
     else if (!ws.repeatedLetters())
       validWords.insert(ws.asString());
   }
+
+  if (validWords.empty())
+    throw std::string("ERROR: (") + __func__ + ") Dictionary is empty";
 }
 
 void WordleGame::selectSecretWord(uint r)
 {
   if (wordList.empty())
-    throw "Error: word bank is empty";
+    throw std::string("ERROR: (") + __func__ + ") Word list is empty";
   else
     sw = wordList[ r % wordList.size() ];
 }

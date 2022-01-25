@@ -1,13 +1,13 @@
 #include <string>
 #include <fstream>
-#include "WordleResponse.hpp"
-#include "WordleSettings.hpp"
+#include "src/WordleResponse.hpp"
+#include "src/WordleSettings.hpp"
 
 int main()
 {
   WordleSettings s;
   s.load();
-  
+
   std::string msg;
   std::ofstream ofs("settings.txt");
 
