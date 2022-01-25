@@ -10,8 +10,10 @@
 
 WordleGame::~WordleGame()
 {
+  wordList.clear();
   guesses.clear();
   wrongLetters.clear();
+  validWords.clear();
 }
 
 /******************************************************************************/
