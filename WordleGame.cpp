@@ -60,7 +60,7 @@ void WordleGame::loadWordList()
   WordleString ws;
 
   wordList.clear();
-  std::ifstream lin(std::to_string(wsz) + "-list.csv");
+  std::ifstream lin("list/" + std::to_string(wsz) + "-list.csv");
   while (lin >> ws) {
     if (gameSettings.repeatedLetters)
       wordList.push_back(ws.asString());
@@ -69,7 +69,7 @@ void WordleGame::loadWordList()
   }
 
   validWords.clear();
-  std::ifstream din(std::to_string(wsz) + "-dict.csv");
+  std::ifstream din("dict/" + std::to_string(wsz) + "-dict.csv");
   while (din >> ws) {
     if (gameSettings.repeatedLetters)
       validWords.insert(ws.asString());
