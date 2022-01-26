@@ -1,9 +1,8 @@
 # Specific
 configs/settings.json
-test.cpp
+test*
 wordle
 settings
-t
 
 # Prerequisites
 *.d

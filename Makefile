@@ -14,7 +14,7 @@ settings: settings.cpp $(H_DEPS)
 	$(CC) settings.cpp $(CFLAGS) -o settings
 
 test: test.cpp $(GAME_DEPS) $(H_DEPS)
-	$(CC) test.cpp $(GAME_DEPS) $(CFLAGS) -o t
+	$(CC) test.cpp $(GAME_DEPS) $(CFLAGS) -o test
 
 clean:
 	rm -rf wordle list-maker settings t
