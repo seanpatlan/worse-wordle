@@ -55,28 +55,29 @@ std::string WordleString::print() const
 /***************************** MODIFIER FUNCTIONS *****************************/
 /******************************************************************************/
 
-void WordleString::evaluate(const std::string& secretWord)
+void WordleString::whiteOut()
+{
+  for (WordleChar& wc : word)
+    wc.color = WordleChar::Color::white;
+}
+
+void WordleString::evaluate(WordleString secretWord)
 {
   if (secretWord.size() != word.size()) return;
 
-  std::string original = "";
-  for (const char& c : secretWord)
-    original += std::toupper(c);
-  std::string wrongSpots = "";
-
+  secretWord.whiteOut();
+  WordleString wrongSpots;
   for (int i = 0; i < word.size(); i++) {
-    if (word[i] == original[i]) {
+    if (word[i] == secretWord[i])
       word[i].color = WordleChar::Color::green;
-    }
-    else {
-      wrongSpots += original[i];
-    }
+    else
+      wrongSpots += secretWord[i];
   }
 
-  for (char& c : wrongSpots)
-    for (WordleChar& wc : word)
-      if (wc.letter == c)
-        wc.color = WordleChar::Color::yellow;
+  for (const WordleChar& cWrong : wrongSpots)
+    for (WordleChar& cWord : word)
+      if (cWord.color != WordleChar::Color::green && cWord == cWrong)
+        cWord.color = WordleChar::Color::yellow;
 }
 
 /******************************************************************************/

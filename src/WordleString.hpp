@@ -36,7 +36,9 @@ public:
   // MODIFIER FUNCTIONS
   void add(const WordleChar& wc) { word.push_back(wc); }
   void clear() { word.clear(); }
-  void evaluate(const std::string& str);
+  void whiteOut();
+  void evaluate(WordleString ws);
+  void evaluate(const std::string& str) { evaluate(WordleString(str)); }
 
   // OPERATORS
   void operator=(const std::string& s);

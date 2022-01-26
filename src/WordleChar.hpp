@@ -14,7 +14,7 @@ struct WordleChar
     letter('\0'),
     color(white)
   {}
-  
+
   WordleChar(const char& _c) : color(white)
   {
     char c = std::toupper(_c);
@@ -45,14 +45,24 @@ struct WordleChar
   }
 
   // OPERATORS
+  bool operator==(const WordleChar& wc) const
+  {
+    return (letter == wc.letter) && (color == wc.color);
+  }
+
   bool operator==(const char& c) const
   {
     return letter == c;
   }
 
+  bool operator!=(const WordleChar& wc) const
+  {
+    return !(*this == wc);
+  }
+
   bool operator!=(const char& c) const
   {
-    return letter != c;
+    return !(*this == c);
   }
 
   void operator=(const char& c)
