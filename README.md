@@ -20,4 +20,8 @@ Just a worse command line version of Wordle written in C++
 
 ---
 
+<<<<<<< HEAD
 - Uses [nlohmann JSON library](https://github.com/nlohmann/json)
+=======
+Uses [nlohmann JSON library](https://github.com/nlohmann/json)
+>>>>>>> 36289d093d96ae405a76cf6a652ac6f15ff3afe8
