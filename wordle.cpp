@@ -4,7 +4,6 @@
 #include <time.h>
 #include "src/WordleString.hpp"
 #include "src/WordleGame.hpp"
-using namespace std;
 
 int main()
 {
@@ -30,9 +29,9 @@ int main()
 
     if (!game.settings().debugMode()) system("clear");
   }
-  catch(const string& errorMessage) {
+  catch(const std::string& errorMessage) {
     if (!game.settings().debugMode()) system("clear");
-    cout << errorMessage << '\n';
+    std::cout << errorMessage << '\n';
   }
 
   return 0;
