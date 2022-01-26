@@ -1,5 +1,5 @@
 # Specific
-config/settings.txt
+configs/settings.json
 test.cpp
 wordle
 settings

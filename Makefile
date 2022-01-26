@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -w
+CFLAGS = -std=c++11 -w
 H_DEPS = src/WordleChar.hpp src/WordleResponse.hpp src/WordleSettings.hpp
 GAME_DEPS = src/WordleString.cpp src/WordleGame.cpp
 

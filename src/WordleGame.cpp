@@ -10,6 +10,8 @@
 
 bool WordleGame::inWordList(const std::string& word) const
 {
+  if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
+
   for (const std::string& s : wordList)
     if (WordleString(word) == s)
       return true;
@@ -18,20 +20,24 @@ bool WordleGame::inWordList(const std::string& word) const
 
 bool WordleGame::guessLimit() const
 {
-  return (gameSettings.guessLimit == 0) ||
-         (guesses.size() < gameSettings.guessLimit);
+  if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
+
+  return (gameSettings.guessLimit() == 0) ||
+         (guesses.size() < gameSettings.guessLimit());
 }
 
-bool WordleGame::goodGuess(const std::string& s) const
+bool WordleGame::goodGuess(const WordleString& ws) const
 {
-  if (s == WordleResponse::INVALID_SIZE)
+  if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
+
+  if (ws == WordleResponse::INVALID_SIZE)
     return false;
 
-  if (gameSettings.checkGuess) {
+  if (gameSettings.checkGuess()) {
     if (validWords.empty())
       throw std::string("ERROR: (") + __func__ + ") Dictionary is empty";
     else
-      return validWords.find(s) != validWords.end();
+      return (validWords.find(ws.asString()) != validWords.end());
   }
 
   return true;
@@ -39,6 +45,8 @@ bool WordleGame::goodGuess(const std::string& s) const
 
 std::string WordleGame::printGuesses() const
 {
+  if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
+
   std::string s = "";
   for (const WordleString& ws : guesses) s += ws.print();
   return s;
@@ -46,6 +54,8 @@ std::string WordleGame::printGuesses() const
 
 std::string WordleGame::printWrongLetters() const
 {
+  if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
+
   if (wrongLetters.empty()) return "";
 
   std::string msg = "Wrong letters: ";
@@ -62,22 +72,26 @@ std::string WordleGame::printWrongLetters() const
 
 void WordleGame::setWordSize()
 {
-  if (gameSettings.wordSize == 0) {
+  if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
+
+  if (gameSettings.wordSize() == 0) {
     std::string msg = "Would you like to play with 4, 5, 6, or 7 letter words?\n";
-    wsz = WordleResponse::getIntResponse(msg, 4, 7, gameSettings.debugMode);
+    wsz = WordleResponse::getIntResponse(msg, 4, 7, gameSettings.debugMode());
   }
   else
-    wsz = gameSettings.wordSize;
+    wsz = gameSettings.wordSize();
 }
 
 void WordleGame::loadWordList()
 {
+  if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
+
   WordleString ws;
 
   wordList.clear();
   std::ifstream lin("csv/" + std::to_string(wsz) + "-list.csv");
   while (lin >> ws) {
-    if (gameSettings.repeatedLetters)
+    if (gameSettings.repeatedLetters())
       wordList.push_back( ws.asString() );
     else if (!ws.repeatedLetters())
       wordList.push_back( ws.asString() );
@@ -88,12 +102,17 @@ void WordleGame::loadWordList()
 
   validWords.clear();
   std::ifstream din("csv/" + std::to_string(wsz) + "-dict.csv");
-  while (gameSettings.checkGuess && din >> ws)
+  while (gameSettings.checkGuess() && din >> ws)
     validWords.insert(ws.asString());
+
+  if (gameSettings.checkGuess() && validWords.empty())
+    throw std::string("ERROR: (") + __func__ + ") Dictionary is empty";
 }
 
 void WordleGame::selectSecretWord(uint r)
 {
+  if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
+
   if (wordList.empty())
     throw std::string("ERROR: (") + __func__ + ") Word list is empty";
   else
@@ -102,31 +121,35 @@ void WordleGame::selectSecretWord(uint r)
 
 WordleString WordleGame::getUserGuess()
 {
-  std::string guessString;
+  if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
+
+  WordleString guess;
   do {
-    if (!gameSettings.debugMode) system("clear");
+    if (!gameSettings.debugMode()) system("clear");
 
     std::string msg = printWrongLetters();
     if (!wrongLetters.empty()) msg += '\n';
     msg += printGuesses();
     if (!guesses.empty()) msg += '\n';
 
-    if (!guessString.empty()) {
-      if (guessString == WordleResponse::INVALID_SIZE)
+    if (!guess.empty()) {
+      if (guess == WordleResponse::INVALID_SIZE)
         msg += "Guess must be " + std::to_string(wsz) + " letters\n\n";
       else
         msg += "Not a valid word\n\n";
     }
 
     msg += "Guess #" + std::to_string(guessCount()+1) + '\n';
-    guessString = WordleResponse::getStringResponse(msg, wsz, gameSettings.debugMode);
-  } while (!goodGuess(guessString));
+    guess = WordleResponse::getStringResponse(msg, wsz, gameSettings.debugMode());
+  } while (!goodGuess(guess));
 
-  return WordleString(guessString);
+  return guess;
 }
 
 bool WordleGame::confirmUserGuess(const WordleString& ws)
 {
+  if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
+
   std::string msg = "";
   msg += printWrongLetters();
   if (!wrongLetters.empty()) msg += '\n';
@@ -135,11 +158,13 @@ bool WordleGame::confirmUserGuess(const WordleString& ws)
   msg += ws.print();
   msg += "(Colors are currently hidden)\n\nConfirm this guess?\n";
 
-  return WordleResponse::getBoolResponse(msg, 'y', 'n', gameSettings.debugMode);
+  return WordleResponse::getBoolResponse(msg, 'y', 'n', gameSettings.debugMode());
 }
 
 void WordleGame::addGuess(const WordleString& ws)
 {
+  if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
+
   guesses.push_back(ws);
 
   for (int i = 0; i < ws.size(); i++)
@@ -149,34 +174,40 @@ void WordleGame::addGuess(const WordleString& ws)
 
 void WordleGame::endDisplay()
 {
+  if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
+
   std::string msg = sw + "\n\n";
   msg += printGuesses();
   if (guesses.back() == sw) {
     msg += "\nCongrats! You got it in ";
     msg += std::to_string(guessCount());
-    if (gameSettings.guessLimit != 0)
-      msg += "/" + std::to_string(gameSettings.guessLimit);
+    if (gameSettings.guessLimit() != 0)
+      msg += "/" + std::to_string(gameSettings.guessLimit());
     msg += " guesses!\n\n";
   }
   else {
     msg += "\nSorry! You've used ";
     msg += std::to_string(guessCount()) + '/';
-    msg += std::to_string(gameSettings.guessLimit);
+    msg += std::to_string(gameSettings.guessLimit());
     msg += " guesses!\n\n";
   }
   msg += "Press enter to continue...\n";
 
-  WordleResponse::waitForEnter(msg, gameSettings.debugMode);
+  WordleResponse::waitForEnter(msg, gameSettings.debugMode());
 }
 
 bool WordleGame::keepPlaying()
 {
+  if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
+
   std::string msg = "Enter 'y' to keep playing, enter 'q' to quit\n";
-  return WordleResponse::getBoolResponse(msg, 'y', 'q', gameSettings.debugMode);
+  return WordleResponse::getBoolResponse(msg, 'y', 'q', gameSettings.debugMode());
 }
 
 void WordleGame::reset()
 {
+  if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
+
   guesses.clear();
   wrongLetters.clear();
 

@@ -28,10 +28,10 @@ int main()
       game.endDisplay();
     } while (game.keepPlaying());
 
-    if (!game.settings().debugMode) system("clear");
+    if (!game.settings().debugMode()) system("clear");
   }
   catch(const string& errorMessage) {
-    if (!game.settings().debugMode) system("clear");
+    if (!game.settings().debugMode()) system("clear");
     cout << errorMessage << '\n';
   }
 

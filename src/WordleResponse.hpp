@@ -8,7 +8,8 @@ struct WordleResponse
   typedef unsigned int uint;
 
   static inline const char* INPUT_SYMBOL = "\n>> ";
-  static inline const char* INVALID_SIZE = "__invalid_size__";
+  static inline const char* INVALID_SIZE = "__INVALID_SIZE__";
+  static inline const uint BUF_MAX = 128;
 
   static std::string boolInputSymbol(char t, char f)
   {
@@ -19,7 +20,7 @@ struct WordleResponse
   {
     if (!dbg) system("clear");
     std::cout << msg << INPUT_SYMBOL;
-    std::cin.ignore(WordleSettings::BUF_MAX, '\n');
+    std::cin.ignore(BUF_MAX, '\n');
   }
 
   static bool getBoolResponse(const std::string& msg, char t, char f, bool dbg)
@@ -28,10 +29,10 @@ struct WordleResponse
     while (true) {
       if (!dbg) system("clear");
       std::cout << msg << boolInputSymbol(t,f);
-      
+
       while (std::isspace(std::cin.peek())) std::cin.ignore();
       std::cin.get(c);
-      std::cin.ignore(WordleSettings::BUF_MAX,'\n');
+      std::cin.ignore(BUF_MAX,'\n');
 
       if (std::toupper(c) == std::toupper(t)) return true;
       if (std::toupper(c) == std::toupper(f)) return false;
@@ -64,7 +65,7 @@ struct WordleResponse
 
     std::string s;
     std::cin >> s;
-    std::cin.ignore(WordleSettings::BUF_MAX,'\n');
+    std::cin.ignore(BUF_MAX,'\n');
 
     if (sz != 0 && s.size() != sz) return INVALID_SIZE;
     return s;

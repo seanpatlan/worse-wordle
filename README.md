@@ -2,6 +2,8 @@
 
 Just a worse command line version of Wordle written in C++
 
+---
+
 ## Instructions for Use
 
 ### To download and compile:
@@ -16,8 +18,8 @@ Just a worse command line version of Wordle written in C++
 ### To adjust the game settings:
 1. Download and compile the code (instructions above)
 2. Type the command `./settings`
-3. *__WARNING:__ trying to edit the settings.txt file directly may corrupt the file*
+3. Once you've run the settings program at least once, you can edit the *configs/settings.json* file directly, or you can continue to use the `./settings` command to adjust settings
 
 ---
 
-- Uses [nlohmann JSON library](https://github.com/nlohmann/json)
+- This code uses the [nlohmann JSON library](https://github.com/nlohmann/json)

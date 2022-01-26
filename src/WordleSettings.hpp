@@ -2,91 +2,58 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include "../lib/json.hpp"
 #pragma once
 
-struct WordleSettings
+class WordleSettings
 {
-  static inline const char* FILE_NAME = "config/settings.txt";
-
+private:
   // MEMBERS
-  int wordSize;
-  bool repeatedLetters;
-  int guessLimit;
-  bool checkGuess;
+  nlohmann::json all;
+public:
+  // settings file
+  static inline const char* FILE_NAME = "configs/settings.json";
 
-  // FOR DEBUGGING
-  bool debugMode;
-
-  // CONSTRUCTOR
-  WordleSettings() :
-    wordSize(5),
-    repeatedLetters(true),
-    guessLimit(6),
-    checkGuess(true),
-    debugMode(false)
-  {}
-
-  // max size of I/O buffer
-  static inline const int BUF_MAX = 128;
-
-  // string labels for settings.txt
+  // string labels for settings file
   static inline const char* WORD_SIZE = "word-size";
   static inline const char* REP_LETTERS = "repeated-letters";
   static inline const char* GUESS_LIMIT = "guess-limit";
   static inline const char* CHECK_GUESS = "check-guess";
   static inline const char* DEBUG_MODE = "debug-mode";
 
-  template<class T>
-  std::ostream& put(std::ostream& out, const std::string& label, const T& value)
+  // CONSTRUCTOR
+  WordleSettings()
   {
-    out << label << ": " << value << ",\n";
-    return out;
+    all[WORD_SIZE] = 5;
+    all[REP_LETTERS] = true;
+    all[GUESS_LIMIT] = 6;
+    all[CHECK_GUESS] = true;
+    all[DEBUG_MODE] = false;
   }
 
-  std::istream& get(std::istream& in, std::string& label, std::string& value)
+  int wordSize() const { return all[WORD_SIZE]; }
+  bool repeatedLetters() const { return all[REP_LETTERS]; }
+  int guessLimit() const { return all[GUESS_LIMIT]; }
+  bool checkGuess() const { return all[CHECK_GUESS]; }
+  bool debugMode() const { return all[DEBUG_MODE]; }
+
+  void print() const
   {
-    std::string s;
-    getline(in, s);
-
-    label.clear();
-    value.clear();
-
-    auto it = s.begin();
-    while (it != s.end() && *it != ':')
-      label += *(it++);
-
-    while (it != s.end() && (*it == ':' || *it == ' ')) it++;
-
-    while (it != s.end() && *it != ',' && !std::isspace(*it))
-      value += *(it++);
-
-    return in;
-  }
-
-  void set(const std::string& label, const std::string& value)
-  {
-    if (value.empty()) return;
-
-    if (label == WORD_SIZE)
-      wordSize = std::stoi(value);
-    else if (label == REP_LETTERS)
-      repeatedLetters = value != "0";
-    else if (label == GUESS_LIMIT)
-      guessLimit = std::stoi(value);
-    else if (label == CHECK_GUESS)
-      checkGuess = value != "0";
-    else if (label == DEBUG_MODE)
-      debugMode = value != "0";
+    std::cout << all.dump(2) << '\n';
   }
 
   void load()
   {
-    std::ifstream ifs(FILE_NAME);
-    std::string label;
-    std::string value;
-
-    while (get(ifs, label, value))
-      set(label, value);
+    std::ifstream in(FILE_NAME);
+    if (in.good())
+      in >> all;
   }
 
+  template<class T>
+  void set(const std::string& label, const T& value)
+  {
+    all[label] = value;
+    std::ofstream out(FILE_NAME);
+    out << all.dump(2);
+  }
 };
