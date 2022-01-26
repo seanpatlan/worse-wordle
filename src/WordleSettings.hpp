@@ -6,10 +6,13 @@
 
 struct WordleSettings
 {
+  static inline const char* FILE_NAME = "config/settings.txt";
+
   // MEMBERS
   int wordSize;
   bool repeatedLetters;
   int guessLimit;
+  bool checkGuess;
 
   // FOR DEBUGGING
   bool debugMode;
@@ -19,17 +22,18 @@ struct WordleSettings
     wordSize(5),
     repeatedLetters(true),
     guessLimit(6),
+    checkGuess(true),
     debugMode(false)
   {}
 
   // max size of I/O buffer
   static inline const int BUF_MAX = 128;
-  static inline const char* FILE_NAME = "config/settings.txt";
 
   // string labels for settings.txt
   static inline const char* WORD_SIZE = "word-size";
   static inline const char* REP_LETTERS = "repeated-letters";
   static inline const char* GUESS_LIMIT = "guess-limit";
+  static inline const char* CHECK_GUESS = "check-guess";
   static inline const char* DEBUG_MODE = "debug-mode";
 
   template<class T>
@@ -67,10 +71,12 @@ struct WordleSettings
       wordSize = std::stoi(value);
     else if (label == REP_LETTERS)
       repeatedLetters = value != "0";
-    else if (label == DEBUG_MODE)
-      debugMode = value != "0";
     else if (label == GUESS_LIMIT)
       guessLimit = std::stoi(value);
+    else if (label == CHECK_GUESS)
+      checkGuess = value != "0";
+    else if (label == DEBUG_MODE)
+      debugMode = value != "0";
   }
 
   void load()

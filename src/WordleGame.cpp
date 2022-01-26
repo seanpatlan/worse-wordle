@@ -22,6 +22,21 @@ bool WordleGame::guessLimit() const
          (guesses.size() < gameSettings.guessLimit);
 }
 
+bool WordleGame::goodGuess(const std::string& s) const
+{
+  if (s == WordleResponse::INVALID_SIZE)
+    return false;
+
+  if (gameSettings.checkGuess) {
+    if (validWords.empty())
+      throw std::string("ERROR: (") + __func__ + ") Dictionary is empty";
+    else
+      return validWords.find(s) != validWords.end();
+  }
+
+  return true;
+}
+
 std::string WordleGame::printGuesses() const
 {
   std::string s = "";
@@ -63,9 +78,9 @@ void WordleGame::loadWordList()
   std::ifstream lin("csv/" + std::to_string(wsz) + "-list.csv");
   while (lin >> ws) {
     if (gameSettings.repeatedLetters)
-      wordList.push_back(ws.asString());
+      wordList.push_back( ws.asString() );
     else if (!ws.repeatedLetters())
-      wordList.push_back(ws.asString());
+      wordList.push_back( ws.asString() );
   }
 
   if (wordList.empty())
@@ -73,11 +88,8 @@ void WordleGame::loadWordList()
 
   validWords.clear();
   std::ifstream din("csv/" + std::to_string(wsz) + "-dict.csv");
-  while (din >> ws)
+  while (gameSettings.checkGuess && din >> ws)
     validWords.insert(ws.asString());
-
-  if (validWords.empty())
-    throw std::string("ERROR: (") + __func__ + ") Dictionary is empty";
 }
 
 void WordleGame::selectSecretWord(uint r)
@@ -108,8 +120,7 @@ WordleString WordleGame::getUserGuess()
 
     msg += "Guess #" + std::to_string(guessCount()+1) + '\n';
     guessString = WordleResponse::getStringResponse(msg, wsz, gameSettings.debugMode);
-  } while (guessString == WordleResponse::INVALID_SIZE ||
-          validWords.find(WordleString(guessString).asString()) == validWords.end());
+  } while (!goodGuess(guessString));
 
   return WordleString(guessString);
 }

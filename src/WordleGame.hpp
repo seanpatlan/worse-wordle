@@ -28,6 +28,7 @@ public:
   const WordleSettings& settings() const { return gameSettings; }
   bool inWordList(const std::string& word) const;
   bool guessLimit() const;
+  bool goodGuess(const std::string& s) const;
   std::string printGuesses() const;
   std::string printWrongLetters() const;
 

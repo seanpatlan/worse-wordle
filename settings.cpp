@@ -34,8 +34,14 @@ int main()
     s.put<int>(ofs, WordleSettings::GUESS_LIMIT, s.guessLimit);
   }
   else {
+    // check guess settings
+    msg = "Would you like the game to check that your guess is a valid dictionary word?\n";
+    msg += "Node: This means that any non-dictionary guesses will be rejected\n";
+    s.checkGuess = WordleResponse::getBoolResponse(msg, 'y', 'n', s.debugMode);
+    s.put<bool>(ofs, WordleSettings::CHECK_GUESS, s.checkGuess);
+
     // repeated letters setting
-    msg = "Would you like to use words with repeated letters?\n";
+    msg = "Would you like to allow words with repeated letters?\n";
     s.repeatedLetters = WordleResponse::getBoolResponse(msg, 'y', 'n', s.debugMode);
     s.put<bool>(ofs, WordleSettings::REP_LETTERS, s.repeatedLetters);
 
