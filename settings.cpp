@@ -64,7 +64,7 @@ int main()
   }
 
   // all done
-  msg = "Game settings have been updated!\n\nPress enter to close this program\n";
+  msg = "Game settings have been updated!\n\nPress enter to close this program...\n";
   WordleResponse::waitForEnter(msg, s.debugMode);
   if (!s.debugMode) system("clear");
 
