@@ -3,6 +3,7 @@
 #include <iostream>
 #include "WordleResponse.hpp"
 #include "WordleGame.hpp"
+using json = nlohmann::json;
 
 /******************************************************************************/
 /****************************** ACCESS FUNCTIONS ******************************/
@@ -86,27 +87,35 @@ void WordleGame::loadWordList()
 {
   if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
 
-  WordleString ws;
+  json fullList;
+  std::ifstream lin(WordleSettings::LIST_JSON);
+  if (lin.good()) lin >> fullList;
+  json subList = fullList[std::to_string(wsz)];
 
   wordList.clear();
-  std::ifstream lin("csv/" + std::to_string(wsz) + "-list.csv");
-  while (lin >> ws) {
-    if (gameSettings.repeatedLetters())
-      wordList.push_back( ws.asString() );
-    else if (!ws.repeatedLetters())
-      wordList.push_back( ws.asString() );
-  }
+  for (const std::string& s : subList)
+    wordList.push_back(s);
 
   if (wordList.empty())
     throw std::string("ERROR: (") + __func__ + ") Word list is empty";
 
+  fullList.clear();
+  subList.clear();
+  std::ifstream din(WordleSettings::DICT_JSON);
+  if (din.good()) din >> fullList;
+  subList = fullList[std::to_string(wsz)];
+
   validWords.clear();
-  std::ifstream din("csv/" + std::to_string(wsz) + "-dict.csv");
-  while (gameSettings.checkGuess() && din >> ws)
-    validWords.insert(ws.asString());
+  if (gameSettings.checkGuess()) {
+    for (const std::string& s : subList)
+      validWords.insert(s);
+  }
 
   if (gameSettings.checkGuess() && validWords.empty())
     throw std::string("ERROR: (") + __func__ + ") Dictionary is empty";
+
+  fullList.clear();
+  subList.clear();
 }
 
 void WordleGame::selectSecretWord(uint r)

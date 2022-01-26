@@ -11,8 +11,10 @@ private:
   // MEMBERS
   nlohmann::json all;
 public:
-  // settings file
-  static inline const char* FILE_NAME = "configs/settings.json";
+  // config file paths
+  static inline const char* SETTINGS_JSON = "configs/settings.json";
+  static inline const char* LIST_JSON = "configs/list.json";
+  static inline const char* DICT_JSON = "configs/dict.json";
 
   // string labels for settings file
   static inline const char* WORD_SIZE = "word-size";
@@ -44,7 +46,7 @@ public:
 
   void load()
   {
-    std::ifstream in(FILE_NAME);
+    std::ifstream in(SETTINGS_JSON);
     if (in.good())
       in >> all;
   }
@@ -53,7 +55,7 @@ public:
   void set(const std::string& label, const T& value)
   {
     all[label] = value;
-    std::ofstream out(FILE_NAME);
+    std::ofstream out(SETTINGS_JSON);
     out << all.dump(2);
   }
 };
