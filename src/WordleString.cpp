@@ -7,9 +7,9 @@
 
 WordleString::WordleString(const std::string& str)
 {
-  word.clear();
+  word.reserve(str.size());
   for (const char& c : str)
-    word.push_back(WordleChar(c));
+    word.emplace_back(c);
 }
 
 /******************************************************************************/
@@ -87,8 +87,9 @@ void WordleString::evaluate(WordleString secretWord)
 void WordleString::operator=(const std::string& str)
 {
   word.clear();
+  word.reserve(str.size());
   for (const char& c : str)
-    add(WordleChar(c));
+    word.emplace_back(c);
 }
 
 void WordleString::operator+=(const WordleString& ws)
