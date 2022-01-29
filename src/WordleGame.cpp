@@ -87,35 +87,31 @@ void WordleGame::loadWordList()
 {
   if (gameSettings.debugMode()) std::cout << "__" << __func__ << "__\n";
 
-  json fullList;
+  if (!wordList.empty() && wordList[0].size() == wsz) return;
+
+  json j;
   std::ifstream lin(WordleSettings::LIST_JSON);
-  if (lin.good()) lin >> fullList;
-  json subList = fullList[std::to_string(wsz)];
+  if (lin.good()) lin >> j;
 
   wordList.clear();
-  for (const std::string& s : subList)
+  for (const std::string& s : j[std::to_string(wsz)])
     wordList.push_back(s);
 
   if (wordList.empty())
     throw std::string("ERROR: (") + __func__ + ") Word list is empty";
 
-  fullList.clear();
-  subList.clear();
+  j.clear();
   std::ifstream din(WordleSettings::DICT_JSON);
-  if (din.good()) din >> fullList;
-  subList = fullList[std::to_string(wsz)];
+  if (din.good()) din >> j;
 
   validWords.clear();
   if (gameSettings.checkGuess()) {
-    for (const std::string& s : subList)
+    for (const std::string& s : j[std::to_string(wsz)])
       validWords.insert(s);
   }
 
   if (gameSettings.checkGuess() && validWords.empty())
     throw std::string("ERROR: (") + __func__ + ") Dictionary is empty";
-
-  fullList.clear();
-  subList.clear();
 }
 
 void WordleGame::selectSecretWord(uint r)
