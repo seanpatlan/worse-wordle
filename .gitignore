@@ -3,6 +3,7 @@ configs/settings.json
 test*
 wordle
 settings
+.vscode/*
 
 # Prerequisites
 *.d
