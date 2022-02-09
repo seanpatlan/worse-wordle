@@ -3,6 +3,7 @@
 
 struct WordleChar
 {
+  // TYPE DEFINITIONS
   enum Color { white = 47, yellow = 43, green = 42 };
 
   // MEMBERS
