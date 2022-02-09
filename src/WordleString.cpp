@@ -35,7 +35,7 @@ bool WordleString::repeatedLetters() const
 
 std::string WordleString::asString() const
 {
-  std::string str = "";
+  std::string str;
   for (const WordleChar& wc : word)
     str += wc.letter;
 
@@ -44,11 +44,11 @@ std::string WordleString::asString() const
 
 std::string WordleString::print() const
 {
-  std::stringstream ss;
+  std::string str;
   for (const WordleChar& wc : word)
-    ss << wc.print();
-  ss << '\n';
-  return ss.str();
+    str += wc.print();
+  str += '\n';
+  return str;
 }
 
 /******************************************************************************/
@@ -58,7 +58,7 @@ std::string WordleString::print() const
 void WordleString::whiteOut()
 {
   for (WordleChar& wc : word)
-    wc.color = WordleChar::Color::white;
+    wc.color = WordleChar::white;
 }
 
 void WordleString::evaluate(WordleString secretWord)
@@ -69,15 +69,15 @@ void WordleString::evaluate(WordleString secretWord)
   WordleString wrongSpots;
   for (int i = 0; i < word.size(); i++) {
     if (word[i] == secretWord[i])
-      word[i].color = WordleChar::Color::green;
+      word[i].color = WordleChar::green;
     else
       wrongSpots += secretWord[i];
   }
 
   for (const WordleChar& cWrong : wrongSpots)
     for (WordleChar& cWord : word)
-      if (cWord.color != WordleChar::Color::green && cWord == cWrong)
-        cWord.color = WordleChar::Color::yellow;
+      if (cWord.color != WordleChar::green && cWord == cWrong)
+        cWord.color = WordleChar::yellow;
 }
 
 /******************************************************************************/
@@ -90,12 +90,6 @@ void WordleString::operator=(const std::string& str)
   word.reserve(str.size());
   for (const char& c : str)
     word.emplace_back(c);
-}
-
-void WordleString::operator+=(const WordleString& ws)
-{
-  for (const WordleChar& wc : ws)
-    add(wc);
 }
 
 bool WordleString::operator==(const std::string str) const

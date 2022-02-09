@@ -8,7 +8,7 @@ class WordleString
 {
 public:
   // TYPE DEFINITIONS
-  typedef unsigned int uint;
+  typedef unsigned short int uint;
   typedef std::vector<WordleChar>::iterator iterator;
   typedef std::vector<WordleChar>::const_iterator const_iterator;
 private:
@@ -42,9 +42,7 @@ public:
 
   // OPERATORS
   void operator=(const std::string& s);
-  void operator+=(const WordleString& ws);
   void operator+=(const WordleChar& wc) { add(wc); }
-  WordleChar& operator[](uint i) { return word[i]; }
   const WordleChar& operator[](uint i) const { return at(i); }
   bool operator==(const std::string str) const;
   bool operator!=(const std::string str) const { return !(*this == str); }
