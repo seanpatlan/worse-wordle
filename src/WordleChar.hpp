@@ -11,18 +11,14 @@ struct WordleChar
   Color color;
 
   // CONSTRUCTORS/DESTRUCTORS
-  WordleChar() :
-    letter('\0'),
-    color(white)
-  {}
-
-  WordleChar(const char& _c) : color(white)
+  WordleChar() : letter('\0'), color(white) {}
+  WordleChar(char c) : color(white)
   {
-    char c = std::toupper(_c);
+    c = std::toupper(c);
     if ((c >= 'A' && c <= 'Z') || c == '_')
       letter = c;
     else
-      letter = 'X';
+      letter = '*';
   }
 
   // ACCESS FUNCTIONS
