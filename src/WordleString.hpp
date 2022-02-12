@@ -1,6 +1,5 @@
-#include <string>
-#include <vector>
 #include <iostream>
+#include <string>
 #include "WordleChar.hpp"
 #pragma once
 
@@ -8,44 +7,90 @@ class WordleString
 {
 public:
   // TYPE DEFINITIONS
-  typedef unsigned short int uint;
-  typedef std::vector<WordleChar>::iterator iterator;
-  typedef std::vector<WordleChar>::const_iterator const_iterator;
+  typedef unsigned short int size_t;
+  class iterator
+  {
+  private:
+    WordleChar* ptr;
+  public:
+    iterator(WordleChar* _ptr) : ptr(_ptr) {}
+
+    WordleChar& operator*() { return *ptr; }
+    const WordleChar& operator*() const { return *ptr; }
+    WordleChar* operator->() { return ptr; }
+    const WordleChar* operator->() const { return ptr; }
+    WordleChar& operator[](size_t i) { return *(ptr+i); }
+    const WordleChar& operator[](size_t i) const { return *(ptr+i); }
+    iterator operator+(size_t i) const { return iterator(ptr+i); }
+    iterator operator-(size_t i) const { return iterator(ptr-i); }
+    bool operator==(const iterator& it) const { return ptr == it.ptr; }
+    bool operator!=(const iterator& it) const { return !(*this == it); }
+    iterator& operator++() { ptr++; return *this; }
+    iterator& operator--() { ptr--; return *this; }
+    iterator& operator++(int) {
+      iterator temp(ptr);
+      ++(*this);
+      return temp;
+    }
+    iterator& operator--(int) {
+      iterator temp(ptr);
+      --(*this);
+      return temp;
+    }
+  };
+
+  // STATIC MEMBERS
+  const static inline size_t INIT_CAP = 8;
 private:
   // MEMBERS
-  std::vector<WordleChar> word;
+  WordleChar* word;
+  size_t sz;
+  size_t cap = INIT_CAP;
 
+  // HELPER FUNCTIONS
+  void reallocate(size_t n);
 public:
   // CONSTRUCTORS/DESTRUCTORS
-  WordleString() {}
-  WordleString(const std::string& str);
+  WordleString() : sz(0), word(new WordleChar[INIT_CAP]) {}
+  WordleString(const std::string& s);
+  WordleString(const WordleString& ws);
+  WordleString(WordleString&& ws) noexcept;
+  ~WordleString();
 
   // ACCESS FUNCTIONS
-  uint size() const { return word.size(); }
-  bool empty() const { return word.empty(); }
-  const WordleChar& at(uint i) const;
-  iterator begin() { return word.begin(); }
-  const_iterator begin() const { return word.begin(); }
-  iterator end() { return word.end(); }
-  const_iterator end() const { return word.end(); }
-  const std::vector<WordleChar>& allLetters() const { return word; }
+  size_t size() const { return sz; }
+  size_t capacity() const { return cap; }
+  bool empty() const { return sz == 0; }
+  const WordleChar& at(size_t i) const;
+  iterator begin() { return std::move(iterator(word)); }
+  const iterator begin() const { return std::move(iterator(word)); }
+  iterator end() { return std::move(iterator(word+sz)); }
+  const iterator end() const { return std::move(iterator(word+sz)); }
   bool repeatedLetters() const;
+  bool contains(char c) const;
   std::string asString() const;
+  std::string colorString() const;
   std::string print() const;
+  bool matchesPattern(const WordleString& other, const std::string& colors) const;
 
   // MODIFIER FUNCTIONS
-  void add(const WordleChar& wc) { word.push_back(wc); }
-  void clear() { word.clear(); }
-  void whiteOut();
-  void evaluate(WordleString ws);
-  void evaluate(const std::string& str) { evaluate(WordleString(str)); }
+  WordleString& add(WordleChar wc);
+  WordleString& clear();
+  WordleString& whiteOut();
+  WordleString& setColors(std::string colors);
+  WordleString& evaluate(WordleString ws);
+  WordleString& evaluate(const std::string& str) { return evaluate(WordleString(str)); }
 
   // OPERATORS
   void operator=(const std::string& s);
+  void operator=(const WordleString& ws);
+  void operator=(WordleString&& ws);
   void operator+=(const WordleChar& wc) { add(wc); }
   const WordleChar& operator[](uint i) const { return at(i); }
-  bool operator==(const std::string str) const;
-  bool operator!=(const std::string str) const { return !(*this == str); }
-  friend std::ostream& operator<<(std::ostream& os, const WordleString& ws);
-  friend std::istream& operator>>(std::istream& is, WordleString& ws);
+  bool operator==(const WordleString& ws) const;
+  bool operator==(const std::string& s) const;
+  bool operator!=(const WordleString& ws) const { return !(*this == ws); }
+  bool operator!=(const std::string& s) const { return !(*this == s); }
+  friend std::ostream& operator<<(std::ostream& out, const WordleString& ws);
+  friend std::istream& operator>>(std::istream& in, WordleString& ws);
 };

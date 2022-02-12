@@ -1,121 +1,312 @@
-#include <sstream>
+#include <vector>
+#include <unordered_set>
 #include "WordleString.hpp"
 
 /******************************************************************************/
 /************************** CONSTRUCTORS/DESTRUCTORS **************************/
 /******************************************************************************/
 
-WordleString::WordleString(const std::string& str)
+WordleString::WordleString(const std::string& s) :
+  sz(s.size()),
+  cap(WordleString::INIT_CAP)
 {
-  word.reserve(str.size());
-  for (const char& c : str)
-    word.emplace_back(c);
+  while (cap < sz) cap += cap/2;
+
+  word = new WordleChar[cap];
+  for (size_t i = 0; i < sz; i++)
+    word[i] = std::move(WordleChar(s[i]));
+}
+
+WordleString::WordleString(const WordleString& ws) :
+  sz(ws.sz),
+  cap(ws.cap)
+{
+  word = new WordleChar[cap];
+  for (size_t i = 0; i < sz; i++)
+    word[i] = ws.word[i];
+}
+
+WordleString::WordleString(WordleString&& ws) noexcept :
+  sz(ws.sz),
+  cap(ws.cap),
+  word(ws.word)
+{
+  ws.sz = 0;
+  ws.cap = INIT_CAP;
+  ws.word = nullptr;
+}
+
+WordleString::~WordleString()
+{
+  delete[] word;
+}
+
+/******************************************************************************/
+/****************************** HELPER FUNCTIONS ******************************/
+/******************************************************************************/
+
+void WordleString::reallocate(size_t n)
+{
+  while (cap < n) cap += cap/2;
+  WordleChar* newWord = new WordleChar[cap];
+
+  for (int i = 0; i < sz; i++)
+    newWord[i] = word[i];
+  
+  delete[] word;
+  word = newWord;
 }
 
 /******************************************************************************/
 /****************************** ACCESS FUNCTIONS ******************************/
 /******************************************************************************/
 
-const WordleChar& WordleString::at(uint i) const
+const WordleChar& WordleString::at(size_t i) const
 {
-  if (i >= word.size())
-    return WordleChar();
-
+  if (i >= sz)
+    throw std::string("WordleString: Referenced element out of range");
+  
   return word[i];
 }
 
 bool WordleString::repeatedLetters() const
 {
-  for (int i = 0; i < word.size(); i++)
-    for (int j = 0; j < word.size(); j++)
+  for (int i = 0; i < sz; i++)
+    for (int j = 0; j < sz; j++)
       if (word[i].letter == word[j].letter && i != j)
         return true;
+  
+  return false;
+}
+
+bool WordleString::contains(char c) const
+{
+  for (size_t i = 0; i < sz; i++)
+    if (word[i].letter == c)
+      return true;
+  
   return false;
 }
 
 std::string WordleString::asString() const
 {
-  std::string str;
-  for (const WordleChar& wc : word)
-    str += wc.letter;
-
-  return str;
+  std::string s;
+  for (int i = 0; i < sz; i++)
+    s += word[i].letter;
+  
+  return s;
 }
 
 std::string WordleString::print() const
 {
-  std::string str;
-  for (const WordleChar& wc : word)
-    str += wc.print();
-  str += '\n';
-  return str;
+  std::string s;
+  for (int i = 0; i < sz; i++)
+    s += word[i].print();
+  s += '\n';
+  return s;
+}
+
+std::string WordleString::colorString() const
+{
+  std::string s;
+  for (size_t i = 0; i < sz; i++)
+    s += word[i].colorString()[0];
+  
+  return s;
+}
+
+bool WordleString::matchesPattern(const WordleString& answer, const std::string& colors) const
+{
+  if (sz != answer.size() || sz != colors.size()) return false;
+
+  std::vector<char> whites, yellows;
+  whites.reserve(sz);
+  yellows.reserve(sz);
+  std::unordered_set<char> wrongSpots(sz);
+
+  for (int i = 0; i < sz; i++)
+    switch (colors[i]) {
+      case 'w': {
+        if (word[i].letter == answer[i].letter)
+          return false;
+        else {
+          whites.emplace_back(word[i].letter);
+          wrongSpots.insert(answer[i].letter);
+          break;
+        }
+      }
+      case 'y': {
+        if (word[i].letter == answer[i].letter)
+          return false;
+        else {
+          yellows.emplace_back(word[i].letter);
+          wrongSpots.insert(answer[i].letter);
+          break;
+        }
+      }
+      case 'g': {
+        if (word[i].letter != answer[i].letter)
+          return false;
+      }
+    }
+  
+  for (const char& w : whites)
+    if (wrongSpots.find(w) != wrongSpots.end())
+      return false;
+
+  for (const char& y : yellows)
+    if (wrongSpots.find(y) == wrongSpots.end())
+      return false;
+
+  return true;
 }
 
 /******************************************************************************/
 /***************************** MODIFIER FUNCTIONS *****************************/
 /******************************************************************************/
 
-void WordleString::whiteOut()
+WordleString& WordleString::add(WordleChar wc)
 {
-  for (WordleChar& wc : word)
-    wc.color = WordleChar::white;
+  if (sz+1 > cap)
+    reallocate(sz+1);
+  
+  word[sz++] = wc;
+
+  return *this;
 }
 
-void WordleString::evaluate(WordleString secretWord)
+WordleString& WordleString::clear()
 {
-  if (secretWord.size() != word.size()) return;
+  delete[] word;
+  cap = INIT_CAP;
+  sz = 0;
+  word = new WordleChar[cap];
+
+  return *this;
+}
+
+WordleString& WordleString::whiteOut()
+{
+  for (int i = 0; i < sz; i++)
+    word[i].setColor('w');
+
+  return *this;
+}
+
+WordleString& WordleString::setColors(std::string colors)
+{
+  if (sz != colors.size()) return *this;
+
+  for (int i = 0; i < sz; i++)
+    word[i].setColor(colors[i]);
+  
+  return *this;
+}
+
+WordleString& WordleString::evaluate(WordleString secretWord)
+{
+  if (secretWord.size() != sz) return *this;
 
   secretWord.whiteOut();
-  WordleString wrongSpots;
-  for (int i = 0; i < word.size(); i++) {
+  std::vector<WordleChar> wrongSpots;
+  wrongSpots.reserve(sz);
+  for (size_t i = 0; i < sz; i++) {
     if (word[i] == secretWord[i])
       word[i].color = WordleChar::green;
     else
-      wrongSpots += secretWord[i];
+      wrongSpots.emplace_back(secretWord[i]);
   }
 
   for (const WordleChar& cWrong : wrongSpots)
-    for (WordleChar& cWord : word)
-      if (cWord.color != WordleChar::green && cWord == cWrong)
-        cWord.color = WordleChar::yellow;
+    for (size_t i = 0; i < sz; i++)
+      if (word[i].color != WordleChar::green && word[i] == cWrong)
+        word[i].setColor('y');
+  
+  return *this;
 }
 
 /******************************************************************************/
 /********************************* OPERATORS **********************************/
 /******************************************************************************/
 
-void WordleString::operator=(const std::string& str)
+void WordleString::operator=(const std::string& s)
 {
-  word.clear();
-  word.reserve(str.size());
-  for (const char& c : str)
-    word.emplace_back(c);
+  delete[] word;
+  sz = s.size();
+  cap = INIT_CAP;
+  while (cap < sz) cap += cap/2;
+
+  word = new WordleChar[cap];
+  for (size_t i = 0; i < sz; i++)
+    word[i] = std::move(WordleChar(s[i]));
 }
 
-bool WordleString::operator==(const std::string str) const
+void WordleString::operator=(const WordleString& ws)
 {
-  if (str.size() != word.size()) return false;
+  if (this != &ws) {
+    delete[] word;
+    sz = ws.sz;
+    cap = ws.cap;
 
-  for (int i = 0; i < word.size(); i++)
-    if (word[i] != str[i])
+    word = new WordleChar[cap];
+    for (size_t i = 0; i < sz; i++)
+      word[i] = ws.word[i];
+  }
+}
+
+void WordleString::operator=(WordleString&& ws)
+{
+  if (this != &ws) {
+    delete[] word;
+    sz = ws.sz;
+    cap = ws.cap;
+    word = ws.word;
+
+    ws.sz = 0;
+    ws.cap = INIT_CAP;
+    ws.word = nullptr;
+  }
+}
+
+bool WordleString::operator==(const WordleString& ws) const
+{
+  if (sz != ws.size()) return false;
+
+  for (int i = 0; i < sz; i++)
+    if (word[i] != ws.at(i))
       return false;
-
+  
   return true;
 }
 
-std::ostream& operator<<(std::ostream& os, const WordleString& ws)
+bool WordleString::operator==(const std::string& s) const
 {
-  for (const WordleChar& wc : ws.word)
-    os << wc;
+  if (sz != s.size()) return false;
 
-  return os;
+  for (int i = 0; i < sz; i++)
+    if (word[i].letter != s[i])
+      return false;
+  
+  return true;
 }
 
-std::istream& operator>>(std::istream& is, WordleString& ws)
+std::ostream& operator<<(std::ostream& out, const WordleString& ws)
+{
+  for (size_t i = 0; i < ws.sz; i++)
+    out << ws.word[i];
+
+  return out;
+}
+
+std::istream& operator>>(std::istream& in, WordleString& ws)
 {
   std::string s;
-  is >> s;
-  ws = s;
+  in >> s;
+  ws = std::move(WordleString(s));
 
-  return is;
+  return in;
 }
+
+/******************************************************************************/
+/********************************** ITERATOR **********************************/
+/******************************************************************************/

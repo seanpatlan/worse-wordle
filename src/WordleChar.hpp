@@ -4,7 +4,7 @@
 struct WordleChar
 {
   // TYPE DEFINITIONS
-  enum Color { white = 47, yellow = 43, green = 42 };
+  enum Color { white = 47, yellow = 43, green = 42, red = 41 };
 
   // MEMBERS
   char letter;
@@ -37,8 +37,31 @@ struct WordleChar
       case green:
         return "green";
       default:
-        return "error";
+        return "undefined";
     }
+  }
+
+  // MODIFIER FUNCTIONS
+  void setColor(char c)
+  {
+    switch (c) {
+      case 'w': {
+        color = white;
+        break;
+      }
+      case 'y': {
+        color = yellow;
+        break;
+      }
+      case 'g': {
+        color = green;
+        break;
+      }
+      default: {
+        color = red;
+        break;
+      }
+    } 
   }
 
   // OPERATORS
